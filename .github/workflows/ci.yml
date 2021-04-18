@@ -1,0 +1,19 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    # allows CI PR runs only from external repos
+    # in other cases push event is used to run it
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != 'pomadchin/sbt-jni'
+    name: ${{ matrix.os }} tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: olafurpg/setup-scala@v10
+      - run: sbt test-plugin
