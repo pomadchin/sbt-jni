@@ -3,15 +3,22 @@ import scala.sys.process._
 val scalaVersions = Seq("3.0.0", "2.13.5", "2.12.13")
 val macrosParadiseVersion = "2.1.1"
 
-// version is derived from latest git tag
-ThisBuild / version := ("git describe --always --dirty=-SNAPSHOT --match v[0-9].*" !!).tail.trim
 ThisBuild / organization := "ch.jodersky"
-ThisBuild / scalacOptions ++= Seq(
+ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-language:experimental.macros"
 )
 ThisBuild / licenses := Seq(("BSD New", url("http://opensource.org/licenses/BSD-3-Clause")))
+ThisBuild / homepage := Some(url("https://github.com/jodersky/sbt-jni"))
+ThisBuild / developers := List(
+  Developer(
+    "jodersky",
+    "Jakob Odersky",
+    "jakob@odersky.com",
+    url("https://jakob.odersky.com")
+  )
+)
 
 lazy val root = (project in file("."))
   .aggregate(macros, core, plugin)
@@ -57,7 +64,6 @@ lazy val plugin = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-jni",
-    publishMavenStyle := false,
     libraryDependencies += "org.ow2.asm" % "asm" % "6.2.1",
     // make project settings available to source
     Compile / sourceGenerators += Def.task {
