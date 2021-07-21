@@ -86,7 +86,7 @@ Note that native methods declared both in Scala and Java are supported. Whereas 
 
 This plugin enables loading native libraries in a safe and transparent manner to the developer (no more explicit, static `System.load("library")` calls required). It does so by providing a class annotation which injects native loading code to all its annottees. Furthermore, in case a native library is not available on the current `java.library.path`, the code injected by the annotation will fall back to loading native libraries packaged according to the rules of `JniPackage`.
 
-Example use:
+### Example use (Scala 2.x):
 ```scala
 import ch.jodersky.jni.nativeLoader
 
@@ -106,6 +106,53 @@ object Main extends App {
 Note: this plugin is just a shorthand for adding `sbt-jni-macros` (the project in `macros/`) and the scala-macros-paradise (on Scala <= 2.13) projects as provided dependencies.
 
 See the [annotation's implementation](macros/src/main/scala/ch/jodersky/jni/annotations.scala) for details about the injected code.
+
+### Example use (Scala 3.x):
+```scala
+import ch.jodersky.jni.nativeLoaderMacro
+
+class Adder(val base: Int) {
+  import Adder.*
+  @native def plus(term: Int): Int // implemented in libadder0.so
+}
+
+// System.load("adder0") happens in the companion object.
+object Adder {
+  inline def load(libraryName: String) = $ { nativeLoaderMacro('libraryName, 'this.getClass) }
+  load("adder0")
+}
+
+// The application feels like a pure Scala app.
+object Main extends App {
+  (new Adder(0)).plus(1)
+}
+```
+
+### JniCore
+| Disabled                       | Source        |
+|--------------------------------|---------------|
+| manual                         | [JniLoad.scala](plugin/src/main/scala/ch/jodersky/sbt/jni/plugins/JniCore.scala) |
+
+This project was intorduced to simplify cross compilation of Scala 2.x and Scala 3.x projects. In Scala 3.x there are no macro annotations anymore, for these reasons an alternative approache were used.
+
+```scala
+import ch.jodersky.jni.NativeLoader
+
+class Adder(val base: Int) {
+  import Adder.*
+  @native def plus(term: Int): Int // implemented in libadder0.so
+}
+
+// System.load("adder0") happens in the companion object.
+object Adder extends NativeLoader("adder0")
+
+// The application feels like a pure Scala app.
+object Main extends App {
+  (new Adder(0)).plus(1)
+}
+```
+
+The code above works in the Scala 2.x as well as in the Scala 3.x projects. The cost of it is a tiny non-provided dependency.
 
 ### JniNative
 | Enabled                        | Source        |
