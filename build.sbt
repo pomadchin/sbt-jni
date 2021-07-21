@@ -9,9 +9,7 @@ ThisBuild / organization := "ch.jodersky"
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  "-language:experimental.macros",
-  //"-Xfatal-warnings"//,
-  //"-Xlint"
+  "-language:experimental.macros"
 )
 ThisBuild / licenses := Seq(("BSD New", url("http://opensource.org/licenses/BSD-3-Clause")))
 
