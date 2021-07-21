@@ -5,15 +5,15 @@ import scala.reflect.macros.whitebox.Context
 import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
 
-class nativeLoaderMacro(val c: Context) {
+class nativeLoaderAnnotation(val c: Context) {
 
   def impl(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
 
     val nativeLibrary: String = c.prefix.tree match {
       case Apply(_, List(Literal(Constant(x: String)))) => x
-      case Apply(_, xs :: tail) => c.abort(xs.pos, "Native library must be a constant.")
-      case t => c.abort(t.pos, "Native library not specified.")
+      case Apply(_, xs :: tail)                         => c.abort(xs.pos, "Native library must be a constant.")
+      case t                                            => c.abort(t.pos, "Native library not specified.")
     }
 
     def inject(annottees: List[Tree]): List[Tree] = annottees match {
@@ -26,7 +26,7 @@ class nativeLoaderMacro(val c: Context) {
         """
 
         val module: List[Tree] = tail match {
-          case Nil => inject(List(q"""object ${name.toTermName}"""))
+          case Nil   => inject(List(q"""object ${name.toTermName}"""))
           case other => inject(other)
         }
 
@@ -105,5 +105,5 @@ class nativeLoaderMacro(val c: Context) {
 
 @compileTimeOnly("Macro Paradise must be enabled to apply annotation.")
 class nativeLoader(nativeLibrary: String) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro nativeLoaderMacro.impl
+  def macroTransform(annottees: Any*): Any = macro nativeLoaderAnnotation.impl
 }
