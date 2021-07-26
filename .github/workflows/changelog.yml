@@ -1,19 +1,24 @@
 name: Generate changelog
 on:
   release:
-    types: [created, edited, published, released]
+    types: [published]
 
 jobs:
-  generate-changelog:
+  update-changelog:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    
+    - name: Generate changelog
+      run: |
+        npm install github-release-notes
+        export GREN_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        npm run overrideChangelog
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
       with:
-        fetch-depth: 0
-    - uses: BobAnkh/auto-generate-changelog@master
-      with:
-        REPO_NAME: '<YourUserName>/<YourRepoName>'
-        ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        PATH: '/CHANGELOG.md'
-        COMMIT_MESSAGE: 'docs(CHANGELOG): update release notes'
-        TYPE: 'feat:Feature,fix:Bug Fixes,docs:Documentation,refactor:Refactor,perf:Performance Improvements'
+        commit-message: update release notes
+        title: Update Changelog
+        body: Update changelog to reflect release changes
+        branch: update-changelog
+        base: main
