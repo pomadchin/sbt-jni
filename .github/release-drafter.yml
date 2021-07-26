@@ -1,0 +1,25 @@
+name-template: 'v$NEXT_MINOR_VERSION'
+tag-template: 'v$NEXT_MINOR_VERSION'
+categories:
+  - title: 'Added'
+    labels:
+      - 'feature'
+  - title: 'Changed'
+    labels:
+      - 'enhancement'
+  - title: 'Fixed'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: 'Maintenance'
+    labels:
+      - 'build'
+      - 'dependency-update'
+exclude-labels:
+  - 'skip-changelog'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes
+
+  $CHANGES
